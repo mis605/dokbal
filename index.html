@@ -719,19 +719,12 @@
 
         // ── API HELPERS ──────────────────────────────────────────────────────────
 
-        /** GET request ke GAS API — sertakan idToken secara otomatis */
+        /** GET request ringan ke GAS API (TANPA idToken — hanya untuk health check) */
         async function apiGet(params = {}) {
-            if (!currentIdToken) throw new Error("Belum login.");
             const url = new URL(API_URL);
-            Object.entries({ ...params, idToken: currentIdToken }).forEach(([k, v]) => url.searchParams.set(k, v));
+            Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
             const res = await fetch(url.toString(), { redirect: "follow" });
-            const data = await res.json();
-            if (data.error && data.error.includes("Unauthorized")) {
-                // Token expired, minta login ulang
-                logout();
-                throw new Error("Sesi habis, silakan login kembali.");
-            }
-            return data;
+            return res.json();
         }
 
         /** POST request ke GAS API — sertakan idToken secara otomatis */
@@ -758,7 +751,8 @@
             const search = document.getElementById("searchInput").value;
             toggleLoader(true);
             try {
-                const res = await apiGet({ action: "getPkwtData", offset, search });
+                // Gunakan POST agar idToken aman di body (tidak hilang saat redirect GAS)
+                const res = await apiPost({ action: "getPkwtData", offset, search });
                 toggleLoader(false);
                 if (res.error) { showToast(res.error, "error"); return; }
                 renderTable(res.data);
