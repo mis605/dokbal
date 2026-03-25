@@ -7,9 +7,13 @@
     <title>Filling Management PKWT</title>
     <meta name="description" content="Filling Management PKWT Dokbal — input dan update flow dokumen kembali PKWT." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Google Client ID — ganti dengan milik Anda -->
+    <meta name="google-signin-client_id"
+        content="556004279063-apavopu04dm6bdgoim9a1rhg660p9m9r.apps.googleusercontent.com" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet" />
     <style>
         /* ── CSS VARIABLES ── */
         :root {
@@ -69,143 +73,486 @@
             text-decoration: none;
         }
 
-        .nav-pill.fill { border-color: #6366f1; color: #6366f1; }
-        .nav-pill.fill.active, .nav-pill.fill:hover { background: #6366f1; color: white; }
+        .nav-pill.fill {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .nav-pill.fill.active,
+        .nav-pill.fill:hover {
+            background: #6366f1;
+            color: white;
+        }
 
         /* ── THEME SWITCH ── */
         .theme-switch-wrapper {
-            display: flex; align-items: center;
+            display: flex;
+            align-items: center;
             background: rgba(0, 0, 0, 0.05);
-            padding: 4px 8px; border-radius: 50px; gap: 8px;
+            padding: 4px 8px;
+            border-radius: 50px;
+            gap: 8px;
         }
-        [data-bs-theme="dark"] .theme-switch-wrapper { background: rgba(255, 255, 255, 0.1); }
-        .theme-switch { display: inline-block; height: 20px; position: relative; width: 40px; }
-        .theme-switch input { display: none !important; }
+
+        [data-bs-theme="dark"] .theme-switch-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 20px;
+            position: relative;
+            width: 40px;
+        }
+
+        .theme-switch input {
+            display: none !important;
+        }
+
         .slider {
-            background-color: #cbd5e1; bottom: 0; cursor: pointer;
-            left: 0; position: absolute; right: 0; top: 0;
-            transition: 0.4s; border-radius: 34px;
+            background-color: #cbd5e1;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: 0.4s;
+            border-radius: 34px;
         }
+
         .slider:before {
-            background-color: white; bottom: 3px; content: "";
-            height: 14px; left: 3px; position: absolute;
-            transition: 0.4s; width: 14px; border-radius: 50%;
+            background-color: white;
+            bottom: 3px;
+            content: "";
+            height: 14px;
+            left: 3px;
+            position: absolute;
+            transition: 0.4s;
+            width: 14px;
+            border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        input:checked + .slider { background-color: var(--accent-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
+
+        input:checked+.slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
 
         /* ── LOADER ── */
         .loader {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 4px;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
             background: linear-gradient(90deg, transparent, #6366f1, transparent);
-            z-index: 2000; overflow: hidden;
+            z-index: 2000;
+            overflow: hidden;
         }
+
         .loader::after {
-            content: ""; position: absolute; width: 40%; height: 100%;
-            background: #6366f1; animation: loadingBar 1.5s infinite ease-in-out;
+            content: "";
+            position: absolute;
+            width: 40%;
+            height: 100%;
+            background: #6366f1;
+            animation: loadingBar 1.5s infinite ease-in-out;
         }
-        @keyframes loadingBar { from { left: -40%; } to { left: 100%; } }
+
+        @keyframes loadingBar {
+            from {
+                left: -40%;
+            }
+
+            to {
+                left: 100%;
+            }
+        }
 
         /* ── TOAST ── */
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
         .custom-toast {
-            min-width: 260px; background: var(--card-bg);
+            min-width: 260px;
+            background: var(--card-bg);
             border-left: 5px solid #6366f1;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-            padding: 0.85rem 1rem; margin-bottom: 10px; border-radius: 8px;
-            display: flex; align-items: center; gap: 12px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             animation: slideIn 0.3s ease-out forwards;
             transition: opacity 0.3s, transform 0.3s;
         }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .custom-toast.success { border-color: #10b981; }
-        .custom-toast.error   { border-color: #ef4444; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .custom-toast.success {
+            border-color: #10b981;
+        }
+
+        .custom-toast.error {
+            border-color: #ef4444;
+        }
 
         /* ── HERO ── */
         .fill-hero {
             background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #818cf8 100%);
-            border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.25rem;
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 0.75rem;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
-            position: relative; overflow: hidden;
+            position: relative;
+            overflow: hidden;
         }
+
         .fill-hero::before {
-            content: ""; position: absolute; top: -30px; right: -30px;
-            width: 180px; height: 180px;
-            background: rgba(255, 255, 255, 0.07); border-radius: 50%;
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 180px;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
         }
+
         .hero-title {
-            color: white; font-size: 1.15rem; font-weight: 900;
-            letter-spacing: 1.5px; text-transform: uppercase;
+            color: white;
+            font-size: 1.15rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
-        .hero-subtitle { color: rgba(255,255,255,0.8); font-size: 0.75rem; font-weight: 500; margin-top: 0.15rem; }
-        .hero-icon { font-size: 2.2rem; color: rgba(255,255,255,0.25); position: relative; z-index: 1; }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.15rem;
+        }
+
+        .hero-icon {
+            font-size: 2.2rem;
+            color: rgba(255, 255, 255, 0.25);
+            position: relative;
+            z-index: 1;
+        }
 
         /* ── TABLE ── */
         .table-container {
-            background: var(--card-bg); border-radius: 12px;
-            border: 1px solid var(--border-color); overflow: hidden;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
         }
-        .table > thead > tr > th {
-            background-color: #312e81; color: #ffffff;
-            font-size: 0.72rem; text-transform: uppercase;
-            letter-spacing: 1px; font-weight: 800;
-            padding: 1.1rem 0.5rem; border-bottom: none;
-            vertical-align: middle; text-align: center;
+
+        .table>thead>tr>th {
+            background-color: #312e81;
+            color: #ffffff;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+            padding: 1.1rem 0.5rem;
+            border-bottom: none;
+            vertical-align: middle;
+            text-align: center;
         }
-        [data-bs-theme="dark"] .table > thead > tr > th { background-color: #4f46e5; }
-        .table > tbody > tr > td {
-            font-size: var(--font-bdy); padding: 0.9rem 0.5rem;
-            vertical-align: middle; border-bottom: 1px solid var(--border-color); text-align: center;
+
+        [data-bs-theme="dark"] .table>thead>tr>th {
+            background-color: #4f46e5;
         }
-        .table > tbody > tr:hover { background-color: rgba(99, 102, 241, 0.04); }
+
+        .table>tbody>tr>td {
+            font-size: var(--font-bdy);
+            padding: 0.9rem 0.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .table>tbody>tr:hover {
+            background-color: rgba(99, 102, 241, 0.04);
+        }
 
         /* ── BADGES ── */
-        .status-badge { font-size: 0.62rem; padding: 0.22rem 0.55rem; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
-        .jenis-badge { background-color: #e2e8f0; color: #475569; font-size: 0.62rem; padding: 0.22rem 0.55rem; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
-        [data-bs-theme="dark"] .jenis-badge { background-color: #334155; color: #cbd5e1; }
+        .status-badge {
+            font-size: 0.62rem;
+            padding: 0.22rem 0.55rem;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .jenis-badge {
+            background-color: #e2e8f0;
+            color: #475569;
+            font-size: 0.62rem;
+            padding: 0.22rem 0.55rem;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        [data-bs-theme="dark"] .jenis-badge {
+            background-color: #334155;
+            color: #cbd5e1;
+        }
 
         /* ── FORM CONTROLS ── */
-        .form-control, .form-select, .input-group-text {
+        .form-control,
+        .form-select,
+        .input-group-text {
             background-color: var(--input-bg) !important;
             color: var(--input-text) !important;
             border-color: var(--border-color) !important;
             border-radius: 8px;
         }
+
         [data-bs-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1) brightness(2); opacity: 1; cursor: pointer;
+            filter: invert(1) brightness(2);
+            opacity: 1;
+            cursor: pointer;
         }
-        .flow-input { width: 128px; font-size: 0.78rem; padding: 0.3rem; border-radius: 6px; }
+
+        .flow-input {
+            width: 128px;
+            font-size: 0.78rem;
+            padding: 0.3rem;
+            border-radius: 6px;
+        }
 
         /* ── PAGINATION ── */
-        .pagination .page-link { color: var(--text-main); background: var(--card-bg); border: 1px solid var(--border-color); margin: 0 2px; border-radius: 8px !important; }
-        .pagination .page-item.active .page-link { background-color: #6366f1; border-color: #6366f1; color: #fff; }
+        .pagination .page-link {
+            color: var(--text-main);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin: 0 2px;
+            border-radius: 8px !important;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #6366f1;
+            border-color: #6366f1;
+            color: #fff;
+        }
 
         /* ── UPLOAD SECTION ── */
-        .upload-section { background: var(--card-bg); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border: 2px dashed var(--border-color); }
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px dashed var(--border-color);
+        }
 
         /* ── EMPTY STATE ── */
-        .empty-state { padding: 3.5rem 2rem; text-align: center; }
-        .empty-state i { font-size: 2.8rem; opacity: 0.35; margin-bottom: 1rem; display: block; }
+        .empty-state {
+            padding: 3.5rem 2rem;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 2.8rem;
+            opacity: 0.35;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* ── AUTH OVERLAY ── */
+        #authOverlay {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 18px;
+            padding: 2.5rem;
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .auth-logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #312e81;
+            margin-bottom: 0.25rem;
+        }
+
+        .auth-sub {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 1.75rem;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #dee2e6;
+        }
+
+        .auth-divider span {
+            font-size: 0.75rem;
+            color: #adb5bd;
+        }
+
+        /* badge user di navbar */
+        .user-badge {
+            font-size: 0.72rem;
+            background: rgba(99, 102, 241, 0.12);
+            color: #6366f1;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1.5px solid #ef4444;
+            color: #ef4444;
+            border-radius: 8px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: white;
+        }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1200px) {
-            .table-responsive { border: 0; }
-            .table > thead { display: none; }
-            .table > tbody > tr { display: block; margin-bottom: 1.25rem; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 0.9rem; }
-            .table > tbody > tr > td { display: flex; justify-content: space-between; align-items: center; text-align: right; border-bottom: 1px solid var(--border-color); padding: 0.55rem 0.4rem; }
-            .table > tbody > tr > td::before { content: attr(data-label); font-weight: 700; text-align: left; font-size: 0.72rem; color: var(--text-muted); margin-right: 0.75rem; white-space: nowrap; }
-            .flow-input { width: 55%; }
+            .table-responsive {
+                border: 0;
+            }
+
+            .table>thead {
+                display: none;
+            }
+
+            .table>tbody>tr {
+                display: block;
+                margin-bottom: 1.25rem;
+                background: var(--card-bg);
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                padding: 0.9rem;
+            }
+
+            .table>tbody>tr>td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.55rem 0.4rem;
+            }
+
+            .table>tbody>tr>td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                text-align: left;
+                font-size: 0.72rem;
+                color: var(--text-muted);
+                margin-right: 0.75rem;
+                white-space: nowrap;
+            }
+
+            .flow-input {
+                width: 55%;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- AUTH OVERLAY —— tampil sebelum login -->
+    <div id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-logo">📁</div>
+            <div class="auth-title">Filling Management</div>
+            <div class="auth-sub">Silakan masuk dengan akun Google perusahaan</div>
+            <div class="auth-divider"><span>Login</span></div>
+            <!-- Google One-Tap / Sign-In Button -->
+            <div id="g_id_onload"
+                data-client_id="556004279063-apavopu04dm6bdgoim9a1rhg660p9m9r.apps.googleusercontent.com"
+                data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                data-auto_prompt="true">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                data-text="signin_with" data-size="large" data-logo_alignment="left">
+            </div>
+        </div>
+    </div>
+
     <div id="loader" class="loader"></div>
     <div id="toastContainer" class="toast-container"></div>
 
@@ -220,6 +567,9 @@
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="nav-pill fill active"><i class="bi bi-folder2-open"></i> Filling Management</span>
+                <span id="userBadge" class="user-badge d-none"></span>
+                <button id="btnLogout" class="btn-logout d-none" onclick="logout()"><i
+                        class="bi bi-box-arrow-right me-1"></i>Logout</button>
                 <div class="theme-switch-wrapper shadow-sm ms-1">
                     <i class="bi bi-moon-stars-fill text-muted" style="font-size:0.8rem"></i>
                     <label class="theme-switch">
@@ -246,8 +596,10 @@
         <!-- Upload CSV -->
         <div class="upload-section shadow-sm">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-cloud-upload me-2" style="color:#6366f1"></i>Update Flow Massal (CSV)</h6>
-                <button class="btn btn-link btn-sm text-decoration-none p-0 fw-bold" style="color:#6366f1" onclick="downloadTemplate()">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-cloud-upload me-2" style="color:#6366f1"></i>Update Flow Massal
+                    (CSV)</h6>
+                <button class="btn btn-link btn-sm text-decoration-none p-0 fw-bold" style="color:#6366f1"
+                    onclick="downloadTemplate()">
                     <i class="bi bi-download"></i> Download Template CSV
                 </button>
             </div>
@@ -294,7 +646,9 @@
                     </tr>
                 </thead>
                 <tbody id="pkwtTableBody">
-                    <tr><td colspan="9" class="text-center py-5">Memuat data...</td></tr>
+                    <tr>
+                        <td colspan="9" class="text-center py-5">Memuat data...</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -305,14 +659,47 @@
         </nav>
     </div>
 
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <script>
         // ── KONFIGURASI ──────────────────────────────────────────────────────────
         // Ganti dengan URL Web App Apps Script Anda setelah deploy
-        const API_URL = "https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwycAEdSJ8K1HH25Tdbaulq9KFeI0ww1Iyn2eK_LamVXtXeHd4hgXTOkKDy0CRC_UZyYw/exec";
 
         // ── STATE ────────────────────────────────────────────────────────────────
         let currentOffset = 0;
         let searchTimer;
+        let currentIdToken = null; // menyimpan Google ID Token setelah login
+
+        // ── GOOGLE AUTH ──────────────────────────────────────────────────────────
+
+        /** Dipanggil otomatis oleh GIS setelah user berhasil Sign-In */
+        function handleCredentialResponse(response) {
+            currentIdToken = response.credential;
+            // Decode JWT payload (tidak perlu library, cukup atob)
+            try {
+                const payload = JSON.parse(atob(currentIdToken.split(".")[1]));
+                document.getElementById("userBadge").textContent = payload.email || payload.name;
+                document.getElementById("userBadge").classList.remove("d-none");
+                document.getElementById("btnLogout").classList.remove("d-none");
+            } catch (_) { }
+            // Sembunyikan auth overlay & muat data
+            document.getElementById("authOverlay").style.display = "none";
+            loadData(0);
+        }
+
+        /** Logout — reset token & tampilkan kembali login screen */
+        function logout() {
+            currentIdToken = null;
+            document.getElementById("userBadge").classList.add("d-none");
+            document.getElementById("btnLogout").classList.add("d-none");
+            document.getElementById("authOverlay").style.display = "flex";
+            // Revoke session Google (opsional)
+            if (typeof google !== "undefined") google.accounts.id.disableAutoSelect();
+            document.getElementById("pkwtTableBody").innerHTML = "";
+            document.getElementById("dataInfo").innerText = "";
+        }
 
         // ── INIT ─────────────────────────────────────────────────────────────────
         window.onload = () => {
@@ -320,7 +707,7 @@
             document.documentElement.setAttribute("data-bs-theme", saved);
             const toggle = document.getElementById("themeToggle");
             if (toggle) toggle.checked = saved === "light";
-            loadData(0);
+            // Data akan dimuat setelah handleCredentialResponse() dipanggil
         };
 
         // ── THEME ────────────────────────────────────────────────────────────────
@@ -332,23 +719,36 @@
 
         // ── API HELPERS ──────────────────────────────────────────────────────────
 
-        /** GET request ke GAS API */
+        /** GET request ke GAS API — sertakan idToken secara otomatis */
         async function apiGet(params = {}) {
+            if (!currentIdToken) throw new Error("Belum login.");
             const url = new URL(API_URL);
-            Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+            Object.entries({ ...params, idToken: currentIdToken }).forEach(([k, v]) => url.searchParams.set(k, v));
             const res = await fetch(url.toString(), { redirect: "follow" });
-            return res.json();
+            const data = await res.json();
+            if (data.error && data.error.includes("Unauthorized")) {
+                // Token expired, minta login ulang
+                logout();
+                throw new Error("Sesi habis, silakan login kembali.");
+            }
+            return data;
         }
 
-        /** POST request ke GAS API */
+        /** POST request ke GAS API — sertakan idToken secara otomatis */
         async function apiPost(body = {}) {
+            if (!currentIdToken) throw new Error("Belum login.");
             const res = await fetch(API_URL, {
                 method: "POST",
                 redirect: "follow",
-                headers: { "Content-Type": "text/plain" }, // GAS tidak terima application/json dari cross-origin
-                body: JSON.stringify(body),
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ ...body, idToken: currentIdToken }),
             });
-            return res.json();
+            const data = await res.json();
+            if (data.error && data.error.includes("Unauthorized")) {
+                logout();
+                throw new Error("Sesi habis, silakan login kembali.");
+            }
+            return data;
         }
 
         // ── DATA LOADING ─────────────────────────────────────────────────────────
@@ -391,12 +791,12 @@
             }
             tbody.innerHTML = data.map(item => {
                 let flowStatus = "BLM KEMBALI";
-                if (item.tanggal_upload)  flowStatus = "UPLOADED";
+                if (item.tanggal_upload) flowStatus = "UPLOADED";
                 else if (item.tanggal_filling) flowStatus = "FILLING";
-                else if (item.tanggal_scan)    flowStatus = "SCAN";
+                else if (item.tanggal_scan) flowStatus = "SCAN";
                 else if (item.tanggal_kembali) flowStatus = "KEMBALI";
                 // Sanitize untuk mencegah XSS
-                const safe = v => String(v || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+                const safe = v => String(v || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
                 const safeId = encodeURIComponent(item.id_pkwt);
                 return `<tr>
                     <td data-label="Info Karyawan" class="text-start">
@@ -419,10 +819,10 @@
         function getStatusClass(s) {
             switch (s) {
                 case "UPLOADED": return "bg-success";
-                case "FILLING":  return "bg-info";
-                case "SCAN":     return "bg-warning text-dark";
-                case "KEMBALI":  return "bg-primary";
-                default:         return "bg-secondary";
+                case "FILLING": return "bg-info";
+                case "SCAN": return "bg-warning text-dark";
+                case "KEMBALI": return "bg-primary";
+                default: return "bg-secondary";
             }
         }
 
@@ -433,9 +833,9 @@
             const updates = {};
             const v = k => document.getElementById(k + "-" + safeId).value;
             if (v("kembali")) updates.tanggal_kembali = v("kembali");
-            if (v("scan"))    updates.tanggal_scan    = v("scan");
+            if (v("scan")) updates.tanggal_scan = v("scan");
             if (v("filling")) updates.tanggal_filling = v("filling");
-            if (v("upload"))  updates.tanggal_upload  = v("upload");
+            if (v("upload")) updates.tanggal_upload = v("upload");
             updates.keterangan_upload = v("ket");
             if (Object.keys(updates).filter(k => k !== "keterangan_upload").length === 0 && !updates.keterangan_upload)
                 return showToast("Input minimal satu tanggal!", "error");
@@ -460,8 +860,8 @@
         function downloadTemplate() {
             const bom = "\uFEFF";
             const sep = "sep=,\n";
-            const h   = "id_pkwt,tanggal_kembali,tanggal_scan,tanggal_filling,tanggal_upload,keterangan_upload\n";
-            const ex  = "PKWT/2025/001,2025-02-01,2025-02-02,2025-02-03,2025-02-04,Selesai Upload\n";
+            const h = "id_pkwt,tanggal_kembali,tanggal_scan,tanggal_filling,tanggal_upload,keterangan_upload\n";
+            const ex = "PKWT/2025/001,2025-02-01,2025-02-02,2025-02-03,2025-02-04,Selesai Upload\n";
             const a = document.createElement("a");
             a.href = URL.createObjectURL(new Blob([bom + sep + h + ex], { type: "text/csv;charset=utf-8;" }));
             a.download = "template_flow_pkwt.csv";
@@ -493,7 +893,7 @@
 
         function renderPagination(total, offset) {
             const limit = 20;
-            const totalPages  = Math.ceil(total / limit);
+            const totalPages = Math.ceil(total / limit);
             const currentPage = Math.floor(offset / limit) + 1;
             const pag = document.getElementById("pagination");
             pag.innerHTML = "";
@@ -527,4 +927,5 @@
         }
     </script>
 </body>
+
 </html>
